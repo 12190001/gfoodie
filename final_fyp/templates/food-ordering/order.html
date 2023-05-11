@@ -110,6 +110,13 @@
                       >{{ order.status }}</span
                     >
                   </p>
+                  {% elif order.status == 'Cancel' %}
+                  <p>
+                    Status:
+                    <span class="badge" style="color: white; background-color: #ff0000;"
+                      >{{ order.status }}</span
+                    >
+                  </p>
                   {% else %}
                   <p>
                     Status:
@@ -121,12 +128,20 @@
                 </div>
                 <div class="order-actions">
                 {% if order.status == 'Waiting' %}
-                  <form action="{% url 'cancel_order' user.pk i.pk%}" method="POST">
+                  <form action="{% url 'cancel_order' user.pk order.pk %}">
                     {% csrf_token %}
                     <button type="submit" class="cancel-order-btn">Cancel Order</button>
                   </form>
                 {% elif order.status == 'Completed' %}
                   {{order.payment_status}}
+                {% elif order.status == 'Cancel' %}
+                  <p>
+                    Status:
+                    <span class="badge" style="color: white; background-color: #ff0000;"
+                      >Cancelled</span
+                    >
+                  </p>
+
                 {% else %}
                   <button class="cancel-order-btn" data-target="#exampleModalToggle{{order.id}}" data-toggle="modal">Payment</button>
                 {% endif %}

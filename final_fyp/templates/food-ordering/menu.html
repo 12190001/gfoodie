@@ -63,9 +63,9 @@
                           </div>
                           <img
                             src="{{i.image.url}}"
-                            class="img-fluid"
                             alt="Image"
-                          />
+                            height="250px"
+                            />
                           <div class="mask-icon">
                             {% if user.role == 'manager' %}
                             <ul>
@@ -96,10 +96,10 @@
                               </li>
                             </ul>
                             {%else%}
-                            <div class="cart">
+                            <div class="cart" style="position:absolute; bottom: 0;">
                                 <form action="{% url 'order' user.pk i.pk %}" method="POST">
                                     {% csrf_token %}
-                                    <button type="submit" class='btn btn-warning' style="border: none;">Add to cart</button>
+                                    <button type="submit" class='cancel-order-btn' style="border: none;">Add to cart</button>
                                 </form>
                             </div>
 

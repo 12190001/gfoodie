@@ -5,8 +5,9 @@
   <!-- Start Slider -->
   <div id="slides-shop" class="cover-slides">
     <ul class="slides-container">
+      {% for item in top_ordered_food %}
       <li class="text-center">
-        <img src="{% static 'images/banner-01.jpeg'%}" alt="" />
+        <img src="{{ item.menu_id__image }}" alt="{{ item.menu_id.item_name }}" />
         <div class="container">
           <div class="row">
             <div class="col-md-12">
@@ -17,7 +18,7 @@
                 >
               </h1>
               <p class="m-b-40">
-                See how your users experience your website in realtime or view
+                {{ item.menu_id__item_name }}
                 <br />
                 trends to see any changes in performance over time.
               </p>
@@ -26,7 +27,8 @@
           </div>
         </div>
       </li>
-      <li class="text-center">
+      {% endfor %}
+      <!-- <li class="text-center">
         <img src="{% static 'images/banner-02.jpg' %}" alt="" />
         <div class="container">
           <div class="row">
@@ -67,7 +69,7 @@
             </div>
           </div>
         </div>
-      </li>
+      </li> -->
     </ul>
     <div class="slides-navigation">
       <a href="#" class="next"

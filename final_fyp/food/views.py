@@ -22,7 +22,7 @@ from datetime import datetime
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import  json
-
+from django.db.models import Count, F, Sum
 
 # Create your views here.
 def home(request):
@@ -254,19 +254,20 @@ def delete_manager(request):
     return redirect('addmanager')
 
 @login_required
-def owner_profile(request, object_id):
+def owner_profile(request):
     profile = CustomUser.objects.get(email = request.user)
     if request.method == 'POST':
-        profile.first_name = request.POST['first_name']
-        profile.last_name = request.POST['last_name']
-        profile.email = request.POST['email']
-        profile.contact_number = request.POST['contact']
+        profile.image =  request.FILES['image'] if 'image' in request.FILES else profile.image
+        profile.first_name = request.POST['first_name'] if request.POST['first_name'] != "" else profile.first_name
+        profile.last_name = request.POST['last_name'] if request.POST['last_name'] != "" else profile.last_name
+        profile.email = request.POST['email'] if request.POST['email'] != "" else profile.email
+        profile.contact_number = request.POST['contact'] if request.POST['contact'] != "" else profile.contact_number
         profile.save()
         messages.success(request, 'Your profile has been updated.')
-    return render(request, 'food-ordering/profile.html')
+    return render(request, 'owner_final/owner_profile.html')
 
 @login_required
-def owner_change_password(request, object_id):
+def owner_change_password(request):
     if request.method == 'POST':
         if profile.password == request.POST['current_password']:
             profile.password = request.POST['password']
@@ -275,11 +276,31 @@ def owner_change_password(request, object_id):
         else:
             messages.error(request, 'Your current password does not match with any.')
 
-    return render(request, 'food-ordering/change_password.html')
+    return render(request, 'owner_final/change_password.html')
 
 @login_required
 def dashboard(request,object_id):
-    return render(request, 'food-ordering/dashboard.html')
+    top_ordered_food = OrderItems.objects.values('menu_id__item_name', 'menu_id__image').annotate(total_ordered=Sum('quantity')).order_by('-total_ordered')[:10]
+
+    print("THTHTH", top_ordered_food)
+
+
+
+    import os
+    from django.conf import settings
+
+    # assume that the string is "/media/my_image.png"
+    for i in top_ordered_food:
+        print(i['menu_id__image'])
+        image_url = os.path.join(settings.MEDIA_URL, i['menu_id__image'])
+        print(image_url)
+        i['menu_id__image'] = image_url
+
+    context = {
+        'menu': MenuItems.objects.all(), 'top_ordered_food':top_ordered_food
+
+    }
+    return render(request, 'food-ordering/dashboard.html', context)
 
 @login_required
 def menu(request, object_id):
@@ -470,11 +491,11 @@ def orders(request, object_id):
         }
     return render(request,'food-ordering/order.html',context )
 
-@login_required
+
 def cancel_order(request, object_id, pk):
     Basket.objects.filter(pk = pk).update(status = 'Cancel')
     messages.success(request, 'Order cancelled.')
-    return redirect(f'dashboard/{object_id}/orders/')
+    return redirect(f'/dashboard/{object_id}/orders/')
 
 
 @login_required

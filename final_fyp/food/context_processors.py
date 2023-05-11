@@ -9,7 +9,8 @@ def orders(request):
             price += items.price
         return {
             'orders':OrderItems.objects.filter(basket_id=basket),
-            'total':price
+            'total':price,
+            'count':OrderItems.objects.filter(basket_id=basket).count()
         }
     except:
         return {}
